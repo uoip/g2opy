@@ -1,6 +1,6 @@
 from setuptools import setup
 from setuptools.command.install import install
-import site
+from distutils.sysconfig import get_python_lib
 import glob
 import shutil
 
@@ -16,12 +16,12 @@ class CopyLibFile(install):
     """
 
     def run(self):
-        install_dirs = site.getsitepackages()
+        install_dir = get_python_lib()
         lib_file = glob.glob(__library_file__)
-        assert len(lib_file) == 1 and len(install_dirs) >= 1     
+        assert len(lib_file) == 1     
 
-        print('copying {} -> {}'.format(lib_file[0], install_dirs[0]))
-        shutil.copy(lib_file[0], install_dirs[0])
+        print('copying {} -> {}'.format(lib_file[0], install_dir))
+        shutil.copy(lib_file[0], install_dir)
 
 
 
