@@ -68,7 +68,7 @@ void declareHyperGraph(py::module & m) {
 
         py::class_<HyperGraph::Vertex, HyperGraph::HyperGraphElement>(cls, "Vertex")
             .def(py::init<int>(),
-                    "id"_a=HyperGraph::UnassignedId)
+                    "id"_a=-1)
             .def("id", &HyperGraph::Vertex::id)                                                                        // -> int
             .def("set_id", &HyperGraph::Vertex::setId,
                     "id"_a)                                                                                // int -> void
@@ -79,7 +79,7 @@ void declareHyperGraph(py::module & m) {
 
         py::class_<HyperGraph::Edge, HyperGraph::HyperGraphElement>(cls, "Edge")
             .def(py::init<int>(),
-                    "id"_a=HyperGraph::InvalidId)
+                    "id"_a=-2)
             .def("resize", &HyperGraph::Edge::resize,
                     "size"_a)                                                                               // virtual, size_t -> void
             .def("vertices", (HyperGraph::VertexContainer& (HyperGraph::Edge::*) ()) &HyperGraph::Edge::vertices,
