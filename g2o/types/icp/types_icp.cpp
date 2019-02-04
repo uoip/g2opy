@@ -82,6 +82,8 @@ namespace g2o {
   Matrix3D VertexSCam::dRidz; // differential quat matrices
   Matrix3D VertexSCam::Kcam;
   double VertexSCam::baseline;
+  Matrix3D VertexCamRig::Kcam[3];
+  Isometry3D VertexCamRig::rig_T_frame[3];
 
   // global initialization
   G2O_ATTRIBUTE_CONSTRUCTOR(init_icp_types)

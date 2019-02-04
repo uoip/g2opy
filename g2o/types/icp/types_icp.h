@@ -364,6 +364,126 @@ namespace g2o {
 
 
 /**
+ * \brief camera rig vertex, derived from SE3 class.
+ * the class will hold the camera rig calibration as Isometry3D + KMat for each sensor.
+ * currenlty hard coded 3 sensors TODO
+ */
+  class G2O_TYPES_ICP_API VertexCamRig : public VertexSE3
+    {
+    public:
+      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+	      VertexCamRig(){}
+
+      // I/O
+      virtual bool read(std::istream& /*is*/){return false;}
+      virtual bool write(std::ostream& /*os*/){return false;}
+
+      // capture the update function to reset aux transforms
+      virtual void oplusImpl(const double* update)
+      {
+        VertexSE3::oplusImpl(update);
+        //setAll();
+      }
+
+      // camera matrix and stereo baseline
+      static Matrix3D Kcam[3];
+      static Isometry3D rig_T_frame[3];
+
+      //// transformations
+      //Eigen::Matrix<double,3,4,Eigen::ColMajor> w2n; // transform from world to node coordinates
+      //Eigen::Matrix<double,3,4,Eigen::ColMajor> w2i; // transform from world to image coordinates
+
+      //// Derivatives of the rotation matrix transpose wrt quaternion xyz, used for
+      //// calculating Jacobian wrt pose of a projection.
+      //Matrix3D dRdx, dRdy, dRdz;
+
+      // transforms
+      //static void transformW2F(Eigen::Matrix<double,3,4,Eigen::ColMajor> &m,
+      //                         const Vector3D &trans,
+      //                         const Quaternion &qrot)
+      //  {
+      //    m.block<3,3>(0,0) = qrot.toRotationMatrix().transpose();
+      //    m.col(3).setZero();         // make sure there's no translation
+      //    Vector4D tt;
+      //    tt.head(3) = trans;
+      //    tt[3] = 1.0;
+      //    m.col(3) = -m*tt;
+      //  }
+
+      //static void transformF2W(Eigen::Matrix<double,3,4,Eigen::ColMajor> &m,
+      //                         const Vector3D &trans,
+      //                         const Quaternion &qrot)
+      //  {
+      //    m.block<3,3>(0,0) = qrot.toRotationMatrix();
+      //    m.col(3) = trans;
+      //  }
+
+      // set up camera matrix
+      static void setKcam(int frame_id, double fx, double fy, double cx, double cy)
+      {
+        Kcam[frame_id].setZero();
+        Kcam[frame_id](0,0) = fx;
+        Kcam[frame_id](1,1) = fy;
+        Kcam[frame_id](0,2) = cx;
+        Kcam[frame_id](1,2) = cy;
+        Kcam[frame_id](2,2) = 1.0;
+      }
+
+      static void setCalibration(int frame_id, Isometry3D r_t_frame )
+      {
+	      rig_T_frame[frame_id]=r_t_frame;
+      }
+
+      // set transform from world to cam coords
+      //void setTransform()  {
+      //  w2n = estimate().inverse().matrix().block<3,4>(0, 0);
+      //  //transformW2F(w2n,estimate().translation(), estimate().rotation());
+      //}
+
+      //// Set up world-to-image projection matrix (w2i), assumes camera parameters
+      //// are filled.
+      //void setProjection() { w2i = Kcam * w2n; }
+
+      //// sets angle derivatives
+      //void setDr()
+      //{
+      //  // inefficient, just for testing
+      //  // use simple multiplications and additions for production code in calculating dRdx,y,z
+      //  // for dS'*R', with dS the incremental change
+      //  dRdx = dRidx * w2n.block<3,3>(0,0);
+      //  dRdy = dRidy * w2n.block<3,3>(0,0);
+      //  dRdz = dRidz * w2n.block<3,3>(0,0);
+      //}
+
+      //// set all aux transforms
+      //void setAll()
+      //{
+      //  setTransform();
+      //  setProjection();
+      //  setDr();
+      //}
+
+      // calculate projection to frame i
+      void mapPoint(Vector2D &res, const int frame_id, const Vector3D &pt3)
+      {
+        Vector4D pt;
+        pt.head<3>() = pt3;
+        pt(3) = 1.0;
+
+	auto world_T_rig = estimate();
+	auto world_T_frame = (world_T_rig*rig_T_frame[frame_id]);
+        Vector3D pix = Kcam[frame_id]*world_T_frame.inverse().matrix().block<3,4>(0, 0)*pt;
+
+        double invp1 = 1.0/pix(2);
+        res = pix.head<2>()*invp1;
+      }
+
+      //static Matrix3D dRidx;
+      //static Matrix3D dRidy;
+      //static Matrix3D dRidz;
+    };
+
+/**
  * \brief Point vertex, XYZ, is in types_sba
  */
 
@@ -402,6 +522,51 @@ namespace g2o {
       // error, which is backwards from the normal observed - calculated
       // _measurement is the measured projection
       _error = kp - _measurement;
+    }
+#ifdef SCAM_ANALYTIC_JACOBIANS
+    // jacobian
+    virtual void linearizeOplus();
+#endif
+};
+
+
+// stereo projection
+// first two args are the measurement type, second two the connection classes
+// TODO the error is implemented as Vector3D where the last dim is the frame_id. 
+// This is not ideal. the error should be Vector 2 and the maybe have a 
+// different edge for the frames? 
+  class G2O_TYPES_ICP_API Edge_XYZ_VRIG : public  BaseBinaryEdge<3, Vector3D, VertexSBAPointXYZ, VertexCamRig>
+{
+  public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+      Edge_XYZ_VRIG(){}
+
+    virtual bool read(std::istream& /*is*/){return false;}
+    virtual bool write(std::ostream& /*os*/) const{return false;}
+
+    // return the error estimate as a 2-vector
+    void computeError()
+    {
+      // from <Point> to <Cam>
+      const VertexSBAPointXYZ *point = static_cast<const VertexSBAPointXYZ*>(_vertices[0]);
+      VertexCamRig *cam = static_cast<VertexCamRig*>(_vertices[1]);
+      //cam->setAll();
+
+      // calculate the projection
+      Vector2D kp;
+      cam->mapPoint(kp,static_cast<int>(_measurement(2)), point->estimate());
+
+      // std::cout << std::endl << "CAM   " << cam->estimate() << std::endl;
+      // std::cout << "POINT " << point->estiamte().transpose() << std::endl;
+      // std::cout << "PROJ  " << kp.transpose() << std::endl;
+      // std::cout << "MEAS  " << _measurement.transpose() << std::endl;
+
+      // error, which is backwards from the normal observed - calculated
+      // _measurement is the measured projection
+
+      _error(2) = 0;
+      _error.head<2>() = kp - _measurement.head<2>();
     }
 #ifdef SCAM_ANALYTIC_JACOBIANS
     // jacobian
