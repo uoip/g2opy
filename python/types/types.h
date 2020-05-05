@@ -2,6 +2,7 @@
 
 #include "slam2d/types_slam2d.h"
 #include "slam3d/types_slam3d.h"
+#include "slam3d_addons/types_slam3d_addons.h"
 
 #include "sba/types_six_dof_expmap.h"
 #include "sba/types_sba.h"
@@ -29,6 +30,9 @@ void declareTypes(py::module & m) {
 
     // slam3d
     declareTypesSlam3d(m);
+
+    // slam3d_addons
+    declareTypesSlam3dAddons(m);
 
     // sba
     declareTypesSBA(m);
