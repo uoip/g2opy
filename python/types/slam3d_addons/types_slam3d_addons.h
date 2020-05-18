@@ -15,6 +15,7 @@
 // #include "edge_se3_pointxyz.h"
 #include "plane3d.h"
 #include "vertex_plane.h"
+#include "edge_plane.h"
 
 
 namespace g2o {
@@ -39,6 +40,7 @@ void declareTypesSlam3dAddons(py::module & m) {
     declarePlane3D(m);
 
     declareVertexPlane(m);
+    declareEdgePlane(m);
 
 
 }
