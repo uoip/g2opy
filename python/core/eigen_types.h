@@ -182,10 +182,10 @@ void declareEigenTypes(py::module & m) {
                 return Eigen::Quaterniond::FromTwoVectors(a, b);
             })
 
-        .def("x", (double (Eigen::Quaterniond::*) () const) &Eigen::Quaterniond::x)
-        .def("y", (double (Eigen::Quaterniond::*) () const) &Eigen::Quaterniond::y)
-        .def("z", (double (Eigen::Quaterniond::*) () const) &Eigen::Quaterniond::z)
-        .def("w", (double (Eigen::Quaterniond::*) () const) &Eigen::Quaterniond::w)
+        .def("x", [](const Eigen::Quaterniond& q) { return q.x(); })
+        .def("y", [](const Eigen::Quaterniond& q) { return q.y(); })
+        .def("z", [](const Eigen::Quaterniond& q) { return q.z(); })
+        .def("w", [](const Eigen::Quaterniond& q) { return q.w(); })
 
         .def("vec", (const Eigen::VectorBlock<const Eigen::Quaterniond::Coefficients,3> (Eigen::Quaterniond::*) () const) &Eigen::Quaterniond::vec)
 
