@@ -27,7 +27,7 @@ make -j8
 cd ..
 python setup.py install
 ```
-Tested under Ubuntu 16.04, Python 3.6+.
+Tested under Fedora Linux 36, Python 3.10.7
 
 
 ## Get Started
