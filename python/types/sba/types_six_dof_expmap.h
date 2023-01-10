@@ -84,6 +84,10 @@ void declareTypesSixDofExpmap(py::module & m) {
         .def("is_depth_positive", &EdgeSE3ProjectXYZ::isDepthPositive)
         .def("linearize_oplus", &EdgeSE3ProjectXYZ::linearizeOplus)
         .def("cam_project", &EdgeSE3ProjectXYZ::cam_project)
+        .def_readwrite("fx", &EdgeSE3ProjectXYZ::fx)       // add python interface for cam params
+        .def_readwrite("fy", &EdgeSE3ProjectXYZ::fy)
+        .def_readwrite("cx", &EdgeSE3ProjectXYZ::cx)
+        .def_readwrite("cy", &EdgeSE3ProjectXYZ::cy)
     ;
 
 
@@ -95,6 +99,11 @@ void declareTypesSixDofExpmap(py::module & m) {
         .def("is_depth_positive", &EdgeSE3ProjectXYZOnlyPose::isDepthPositive)
         .def("linearize_oplus", &EdgeSE3ProjectXYZOnlyPose::linearizeOplus)
         .def("cam_project", &EdgeSE3ProjectXYZOnlyPose::cam_project)
+        .def_readwrite("fx", &EdgeSE3ProjectXYZOnlyPose::fx)       // add python interface for cam params and the map point Xw
+        .def_readwrite("fy", &EdgeSE3ProjectXYZOnlyPose::fy)
+        .def_readwrite("cx", &EdgeSE3ProjectXYZOnlyPose::cx)
+        .def_readwrite("cy", &EdgeSE3ProjectXYZOnlyPose::cy)
+        .def_readwrite("Xw", &EdgeSE3ProjectXYZOnlyPose::Xw)
     ;
 
 
