@@ -1,4 +1,4 @@
-
+// object_slam is from (suo-slam)[https://github.com/rpng/suo_slam]
 #ifndef G2O_OBJECT_SLAM_TYPES
 #define G2O_OBJECT_SLAM_TYPES
 
