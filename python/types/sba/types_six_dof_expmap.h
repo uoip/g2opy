@@ -92,6 +92,7 @@ void declareTypesSixDofExpmap(py::module & m) {
 
 
     // Edge to optimize only the camera pose
+	/* conflicts with object_slam types. TODO figure out how to have both or just use this one.
     templatedBaseUnaryEdge<2, Vector2D, VertexSE3Expmap>(m, "BaseUnaryEdge_2_Vector2D_VertexSE3Expmap");
     py::class_<EdgeSE3ProjectXYZOnlyPose, BaseUnaryEdge<2, Vector2D, VertexSE3Expmap>>(m, "EdgeSE3ProjectXYZOnlyPose")
         .def(py::init<>())
@@ -105,7 +106,7 @@ void declareTypesSixDofExpmap(py::module & m) {
         .def_readwrite("cy", &EdgeSE3ProjectXYZOnlyPose::cy)
         .def_readwrite("Xw", &EdgeSE3ProjectXYZOnlyPose::Xw)
     ;
-
+	*/
 
     // Projection using focal_length in x and y directions stereo
     py::class_<EdgeStereoSE3ProjectXYZ, BaseBinaryEdge<3, Vector3D, VertexSBAPointXYZ, VertexSE3Expmap>>(m, "EdgeStereoSE3ProjectXYZ")
