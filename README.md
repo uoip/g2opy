@@ -18,16 +18,16 @@ In the contrib folder, I collected some useful 3rd-party C++ code related to g2o
 
 ## Installation
 ```
-git clone https://github.com/uoip/g2opy.git
+git clone https://github.com/shrimo/g2opy.git
 cd g2opy
 mkdir build
 cd build
 cmake ..
-make -j8
+make -j4
 cd ..
 python setup.py install
 ```
-Tested under Ubuntu 16.04, Python 3.6+.
+Tested under Fedora Linux 36, Python 3.10.7
 
 
 ## Get Started
