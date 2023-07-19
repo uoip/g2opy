@@ -308,7 +308,7 @@ licenses for more details.
 #### Mac OS X
 If using [Homebrew](http://brew.sh/), then
 
-`brew install homebrew/science/g2o`
+`brew install g2o`
 
 will install g2o together with its required dependencies. In this case no manual compilation is necessary.
 
