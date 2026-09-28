@@ -1,4 +1,10 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.1)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
+
+# This is a legacy project: several sub-directories (and the vendored pybind11 /
+# csparse copies) still declare cmake_minimum_required() below 3.5, which CMake 4
+# rejects outright.  Tell CMake to treat those as 3.5 so the build still configures.
+SET(CMAKE_POLICY_VERSION_MINIMUM 3.5)
+
 SET(CMAKE_LEGACY_CYGWIN_WIN32 0)
 
 PROJECT(g2o)
@@ -171,11 +177,11 @@ IF(CMAKE_COMPILER_IS_GNUCXX)
   OPTION (BUILD_WITH_MARCH_NATIVE "Build with \"-march native\"" ON)
   MESSAGE(STATUS "Compiling with GCC")
   
-  IF(NOT "${ARCH}" MATCHES "arm")
-    # Generic settings for optimisation
-    SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -msse4.2")
-    SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3 -msse4.2")
-  ENDIF()
+  # IF(NOT "${ARCH}" MATCHES "arm")
+  #   # Generic settings for optimisation
+  #   SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -msse4.2")
+  #   SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3 -msse4.2")
+  # ENDIF()
 
   IF(G2O_FAST_MATH)
     SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -ffast-math")

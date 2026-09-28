@@ -33,6 +33,12 @@
 
 namespace g2o {
 
+  // Out-of-line definitions for the in-class initialised static const members.
+  // They are ODR-used (bound to const references) as default argument values by
+  // the Python bindings, which needs a definition to link against.
+  const int HyperGraph::UnassignedId;
+  const int HyperGraph::InvalidId;
+
   HyperGraph::Data::Data() {
     _next = 0;
     _dataContainer = 0;
